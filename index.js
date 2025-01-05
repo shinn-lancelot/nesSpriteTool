@@ -16,10 +16,12 @@ let tiles = []  //所有图块数据
 let perSpriteSize = 40
 let spriteXOffset = 2
 let spriteYOffset = 2
+let bgSize = 2
 let rowNum = 0 //图案显示的行个数
 let showLine = true //显示分割线
 let curSelectColor = null //当前选中的颜色
 let curSelectTile = null
+let selectedKey = -1
 let tile4 = [null, null, null, null] //2x2
 let tile8 = [null, null, null, null, null, null, null, null] //2x4
 let tile3 = [] //20*4
@@ -121,7 +123,13 @@ var sysPalette = [
   "rgb(248, 216, 248)",
   "rgb(  0,   0,   0)",
   "rgb(  0,   0,   0)",
-  "rgb(  0,   0,   0,0)",
+  "rgb(12, 147, 0)",
+  "rgb(21, 95, 217)",
+  "rgb(234, 158, 34)",
+  "rgb(198, 118, 255)",
+  "rgb(181, 49, 32)",
+  "rgb(255, 254, 255)",
+  "rgb(72, 205, 222)",
 ]
 
 /**
@@ -167,9 +175,7 @@ function init() {
       '<div class="sw ng-scope" onclick="selectPalette(' +
       i +
       ')"' +
-      ' style="background-color:' +
-      sysPalette[i].replace(";", "") +
-      '"></div>'
+      ' style="background-color:' + sysPalette[i] + '; font-size: 12px; color: #fff; text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;">' + sysPalette[i].replace('rgb', '').replace('(', '').replace(')', '') + '</div>'
   }
   sPalette.innerHTML = str
 
@@ -189,6 +195,8 @@ function init() {
     let rowY =
       parseInt((e.clientY - box.top) / (perSpriteSize + spriteYOffset)) * rowNum
     console.log(rowX, rowY)
+    selectedKey = rowX + rowY
+    printTitle(rowNum)
     if (rowX != rowNum) {
       if (rowX + rowY < tiles.length) {
         // console.log(tiles[rowX+rowY].printData())
@@ -211,11 +219,17 @@ function init() {
     let box = this.getBoundingClientRect()
     let rowX = parseInt((e.clientX - box.left) / 64)
     let rowY = parseInt((e.clientY - box.top) / 64) * 2
-    //更改图块
-    console.log(rowX, rowY)
     tile4[rowY + rowX] = curSelectTile
-    console.log(curSelectTile)
     drawTile4()
+    updateSelected()
+  })
+  canvas4.addEventListener('contextmenu', function (e) {
+    let box = this.getBoundingClientRect()
+    let rowX = parseInt((e.clientX - box.left) / 64)
+    let rowY = parseInt((e.clientY - box.top) / 64) * 2
+    tile4[rowY + rowX] = null
+    drawTile4()
+    updateSelected(false)
   })
 
   let canvas8 = document.getElementById("tile2x4")
@@ -228,11 +242,18 @@ function init() {
     let box = this.getBoundingClientRect()
     let rowX = parseInt((e.clientX - box.left) / 40)
     let rowY = parseInt((e.clientY - box.top) / 40) * 2
-    //更改图块
-    console.log(rowX, rowY)
     tile8[rowY + rowX] = curSelectTile
-    console.log(curSelectTile)
     drawTile8()
+    updateSelected()
+  })
+  canvas8.addEventListener('contextmenu', function (e) {
+    e.preventDefault()
+    let box = this.getBoundingClientRect()
+    let rowX = parseInt((e.clientX - box.left) / 40)
+    let rowY = parseInt((e.clientY - box.top) / 40) * 2
+    tile8[rowY + rowX] = null
+    drawTile8()
+    updateSelected(false)
   })
 
   let canvas3 = document.getElementById("tile20x4")
@@ -246,7 +267,17 @@ function init() {
     let rowY = parseInt((e.clientY - box.top) / 40) * 20
     tile3[rowY + rowX] = curSelectTile
     drawTile16()
+    updateSelected()
   })
+  canvas3.addEventListener('contextmenu', function(e) {
+    e.preventDefault()
+    let box = this.getBoundingClientRect()
+    let rowX = parseInt((e.clientX - box.left) / 40)
+    let rowY = parseInt((e.clientY - box.top) / 40) * 20
+    tile3[rowY + rowX] = null
+    drawTile16()
+    updateSelected(false)
+  });
 
   drawTile4()
   drawTile8()
@@ -466,16 +497,38 @@ function readNesRom(rom) {
 function printTitle(rowNum) {
   let canvas = document.getElementById("editor")
   let ctx = canvas.getContext("2d")
+  let selected = 0
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
   for (let i = 0; i < tiles.length; i++) {
     let yoffset = parseInt(i / rowNum)
+    selected = 0
+    if (selectedKey >= 0 && selectedKey == i) {
+      selected = 1
+    }
     tiles[i].drawData(
       ctx,
       (i % rowNum) * perSpriteSize + (i % rowNum) * 2,
       yoffset * perSpriteSize + yoffset * spriteYOffset,
       paletteRom,
-      5
+      5,
+      selected
     )
   }
+}
+
+function updateSelected(go = true) {
+  if (go) {
+    if (selectedKey + 1 < tiles.length) {
+      selectedKey++
+    }
+  } else {
+    if (selectedKey > 0) {
+      selectedKey--
+    }
+  }
+  
+  printTitle(rowNum)
+  curSelectTile = tiles[selectedKey]
 }
 
 //导出图片
@@ -577,7 +630,7 @@ class Tile {
   }
 
   //默认从0开始
-  drawData(ctx, xOffset, yOffset, palette, size = 5) {
+  drawData(ctx, xOffset, yOffset, palette, size = 5, selected = 0) {
     // for (let i = 0; i < this.data.length; i += 8) {
     //   let yset = parseInt(i / 8)
     //   for (let y = 0; y < 8; y++) {
@@ -585,6 +638,20 @@ class Tile {
     //     ctx.fillRect(y * size + xOffset, yset * size + yOffset, size, size)
     //   }
     // }
+
+    if (selected == 1) {
+      // 8*8矩阵的宽高是5*8，加上边框2*2，所以宽高是44，44/bgSize=22，所以是22 * 22矩阵
+      for (let j = 0; j < 22 * 22; j++) {
+        ctx.fillStyle = 'rgb(237, 174, 110)'
+        ctx.fillRect(
+          (j % 22) * bgSize + xOffset - spriteXOffset,
+          parseInt(j / 22) * bgSize + yOffset - spriteYOffset,
+          bgSize,
+          bgSize
+        )
+      }
+    }
+
     for (let i = 0; i < this.data.length; i++) {
       ctx.fillStyle = palette[this.data[i]]
       ctx.fillRect(
