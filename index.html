@@ -84,36 +84,7 @@
   </head>
   <body>
     <div class="main">
-      <div name="tiles">
-        <div class="canvasTool">
-          <div>
-            <button class="btn" onclick="clearImg('tile2x2')">clear</button>
-            <button class="btn" onclick="exportPng('tile2x2')">
-              export png
-            </button>
-          </div>
-          <canvas id="tile2x2" class="canvas"></canvas>
-        </div>
-
-        <div class="canvasTool" style="margin-left: 10px">
-          <div>
-            <button class="btn" onclick="clearImg('tile2x4')">clear</button>
-            <button class="btn" onclick="exportPng('tile2x4')">
-              export png
-            </button>
-          </div>
-          <canvas id="tile2x4" class="canvas"></canvas>
-        </div>
-        <div class="canvasTool" style="margin-left: 10px">
-          <div>
-            <button class="btn" onclick="clearImg('tile20x4')">clear</button>
-            <button class="btn" onclick="exportPng('tile20x4')">
-              export png
-            </button>
-          </div>
-          <canvas id="tile20x4" class="canvas"></canvas>
-        </div>
-      </div>
+      <div class="palette ng-scope" id="sysPalette"></div>
       <div class="palette">
         <div class="paletteDiv">
           <label>tile2x2</label>
@@ -154,11 +125,11 @@
           <div class="tool" onclick="paletteClick(this,'tile2x4','3')" style="background-color: rgb(0, 0, 0)">3</div>
         </div>
         <div class="paletteDiv">
-          <label>tile20x4</label>
-          <div class="tool" onclick="paletteClick(this,'tile20x4','0')" style="background-color: rgb(0, 0, 0, 0)">0</div>
-          <div class="tool" onclick="paletteClick(this,'tile20x4','1')" style="background-color: rgb(188, 188, 188)">1</div>
-          <div class="tool" onclick="paletteClick(this,'tile20x4','2')" style="background-color: rgb(124, 124, 124)">2</div>
-          <div class="tool" onclick="paletteClick(this,'tile20x4','3')" style="background-color: rgb(0, 0, 0)">3</div>
+          <label>tile30x4</label>
+          <div class="tool" onclick="paletteClick(this,'tile30x4','0')" style="background-color: rgb(0, 0, 0, 0)">0</div>
+          <div class="tool" onclick="paletteClick(this,'tile30x4','1')" style="background-color: rgb(188, 188, 188)">1</div>
+          <div class="tool" onclick="paletteClick(this,'tile30x4','2')" style="background-color: rgb(124, 124, 124)">2</div>
+          <div class="tool" onclick="paletteClick(this,'tile30x4','3')" style="background-color: rgb(0, 0, 0)">3</div>
         </div>
         <div class="paletteDiv">
           <label>rom</label>
@@ -166,6 +137,36 @@
           <div class="tool" onclick="paletteClick(this,'rom','1')" style="background-color: rgb(188, 188, 188)">1</div>
           <div class="tool" onclick="paletteClick(this,'rom','2')" style="background-color: rgb(124, 124, 124)">2</div>
           <div class="tool" onclick="paletteClick(this,'rom','3')" style="background-color: rgb(0, 0, 0)">3</div>
+        </div>
+      </div>
+      <div name="tiles">
+        <div class="canvasTool">
+          <div>
+            <button class="btn" onclick="clearImg('tile2x2')">clear</button>
+            <button class="btn" onclick="exportPng('tile2x2')">
+              export png
+            </button>
+          </div>
+          <canvas id="tile2x2" class="canvas"></canvas>
+        </div>
+
+        <div class="canvasTool" style="margin-left: 10px">
+          <div>
+            <button class="btn" onclick="clearImg('tile2x4')">clear</button>
+            <button class="btn" onclick="exportPng('tile2x4')">
+              export png
+            </button>
+          </div>
+          <canvas id="tile2x4" class="canvas"></canvas>
+        </div>
+        <div class="canvasTool" style="margin-left: 10px">
+          <div>
+            <button class="btn" onclick="clearImg('tile30x4')">clear</button>
+            <button class="btn" onclick="exportPng('tile30x4')">
+              export png
+            </button>
+          </div>
+          <canvas id="tile30x4" class="canvas"></canvas>
         </div>
       </div>
       <div class="file">
@@ -181,7 +182,7 @@
         <input type="file" id="nesfile" name="nesfile" onchange="nesFile()" />
       </div>
 
-      <div class="palette ng-scope" id="sysPalette"></div>
+      
 
       <div class="editor" id="editorDiv">
         <canvas id="editor" class="canvas"></canvas>

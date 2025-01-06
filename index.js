@@ -26,8 +26,9 @@ let tile4 = [null, null, null, null] //2x2
 let tile8 = [null, null, null, null, null, null, null, null] //2x4
 let tile3 = [] //20*4
 //每个tile增加
-let horizontally=0
-let vertically=0
+let horizontally = 0
+let vertically = 0
+let scale = 1
 
 let palette = [
   "rgb(0, 0, 0,0)",
@@ -210,38 +211,39 @@ function init() {
 
   //设置4*4画布 大小128px 分割成4块
   let canvas4 = document.getElementById("tile2x2")
-  canvas4.width = 128
-  canvas4.height = 128
+  canvas4.width = 128 * scale
+  canvas4.height = 128 * scale
   let ctx4 = canvas4.getContext("2d")
   ctx4.imageSmoothingEnabled = false
 
   canvas4.addEventListener("click", function (e) {
     let box = this.getBoundingClientRect()
-    let rowX = parseInt((e.clientX - box.left) / 64)
-    let rowY = parseInt((e.clientY - box.top) / 64) * 2
+    let rowX = parseInt((e.clientX - box.left) / (64 * scale))
+    let rowY = parseInt((e.clientY - box.top) / (64 * scale)) * 2
     tile4[rowY + rowX] = curSelectTile
     drawTile4()
     updateSelected()
   })
   canvas4.addEventListener('contextmenu', function (e) {
+    e.preventDefault()
     let box = this.getBoundingClientRect()
-    let rowX = parseInt((e.clientX - box.left) / 64)
-    let rowY = parseInt((e.clientY - box.top) / 64) * 2
+    let rowX = parseInt((e.clientX - box.left) / (64 * scale))
+    let rowY = parseInt((e.clientY - box.top) / (64 * scale)) * 2
     tile4[rowY + rowX] = null
     drawTile4()
     updateSelected(false)
   })
 
   let canvas8 = document.getElementById("tile2x4")
-  canvas8.width = 80
-  canvas8.height = 40 * 4
+  canvas8.width = 80 * scale
+  canvas8.height = 40 * 4 * scale
   let ctx8 = canvas8.getContext("2d")
   ctx8.imageSmoothingEnabled = false
 
   canvas8.addEventListener("click", function (e) {
     let box = this.getBoundingClientRect()
-    let rowX = parseInt((e.clientX - box.left) / 40)
-    let rowY = parseInt((e.clientY - box.top) / 40) * 2
+    let rowX = parseInt((e.clientX - box.left) / (40 * scale))
+    let rowY = parseInt((e.clientY - box.top) / (40 * scale)) * 2
     tile8[rowY + rowX] = curSelectTile
     drawTile8()
     updateSelected()
@@ -249,22 +251,22 @@ function init() {
   canvas8.addEventListener('contextmenu', function (e) {
     e.preventDefault()
     let box = this.getBoundingClientRect()
-    let rowX = parseInt((e.clientX - box.left) / 40)
-    let rowY = parseInt((e.clientY - box.top) / 40) * 2
+    let rowX = parseInt((e.clientX - box.left) / (40 * scale))
+    let rowY = parseInt((e.clientY - box.top) / (40 * scale)) * 2
     tile8[rowY + rowX] = null
     drawTile8()
     updateSelected(false)
   })
 
-  let canvas3 = document.getElementById("tile20x4")
-  canvas3.width = 40 * 20
-  canvas3.height = 40 * 4
+  let canvas3 = document.getElementById("tile30x4")
+  canvas3.width = 40 * 30 * scale
+  canvas3.height = 40 * 4 * scale
   let ctx16 = canvas3.getContext("2d")
   ctx16.imageSmoothingEnabled = false
   canvas3.addEventListener("click", function (e) {
     let box = this.getBoundingClientRect()
-    let rowX = parseInt((e.clientX - box.left) / 40)
-    let rowY = parseInt((e.clientY - box.top) / 40) * 20
+    let rowX = parseInt((e.clientX - box.left) / (40 * scale))
+    let rowY = parseInt((e.clientY - box.top) / (40 * scale)) * 30
     tile3[rowY + rowX] = curSelectTile
     drawTile16()
     updateSelected()
@@ -272,8 +274,8 @@ function init() {
   canvas3.addEventListener('contextmenu', function(e) {
     e.preventDefault()
     let box = this.getBoundingClientRect()
-    let rowX = parseInt((e.clientX - box.left) / 40)
-    let rowY = parseInt((e.clientY - box.top) / 40) * 20
+    let rowX = parseInt((e.clientX - box.left) / (40 * scale))
+    let rowY = parseInt((e.clientY - box.top) / (40 * scale)) * 30
     tile3[rowY + rowX] = null
     drawTile16()
     updateSelected(false)
@@ -307,7 +309,7 @@ function drawTile4() {
   }
   for (let i = 0; i < tile4.length; i++) {
     if (tile4[i] != null || tile4[i] != undefined)
-      tile4[i].drawData(ctx4, (i % 2) * 64, parseInt(i / 2) * 64, palette, 8)
+      tile4[i].drawData(ctx4, (i % 2) * 64 * scale, parseInt(i / 2) * 64 * scale, palette, 8 * scale)
   }
 }
 
@@ -340,27 +342,27 @@ function drawTile8() {
   }
   for (let i = 0; i < tile8.length; i++) {
     if (tile8[i] != null || tile8[i] != undefined)
-      tile8[i].drawData(ctx8, (i % 2) * 40, parseInt(i / 2) * 40, palette8, 5)
+      tile8[i].drawData(ctx8, (i % 2) * 40 * scale, parseInt(i / 2) * 40 * scale, palette8, 5 * scale)
   }
 }
 
 function drawTile16() {
-  let canvas16 = document.getElementById("tile20x4")
+  let canvas16 = document.getElementById("tile30x4")
   let ctx16 = canvas16.getContext("2d")
   ctx16.clearRect(0, 0, canvas16.width, canvas16.height)
   if (showLine) {
     ctx16.fillStyle = "rgb(188, 188, 188)"
     ctx16.lineWidth = 1
-    for (let i = 1; i < 20; i++) {
+    for (let i = 1; i < 30; i++) {
       ctx16.beginPath()
-      ctx16.moveTo(40 * i, 0)
-      ctx16.lineTo(40 * i, canvas16.height)
+      ctx16.moveTo(40 * scale * i, 0)
+      ctx16.lineTo(40 * scale * i, canvas16.height)
       ctx16.stroke()
     }
     for (let i = 1; i < 4; i++) {
       ctx16.beginPath()
-      ctx16.moveTo(0, 40 * i)
-      ctx16.lineTo(canvas16.width, 40 * i)
+      ctx16.moveTo(0, 40 * scale * i)
+      ctx16.lineTo(canvas16.width, 40 * scale * i)
       ctx16.stroke()
     }
   }
@@ -369,10 +371,10 @@ function drawTile16() {
     if (tile3[i] != null || tile3[i] != undefined)
       tile3[i].drawData(
         ctx16,
-        (i % 20) * 40,
-        parseInt(i / 20) * 40,
+        (i % 30) * 40 * scale,
+        parseInt(i / 30) * 40 * scale,
         palette20,
-        5
+        5 * scale
       )
   }
 }
@@ -483,6 +485,7 @@ function readNesRom(rom) {
     spriteYOffset * (sprietCount / rowNum) +
     perSpriteSize
   // let ctx = canvas.getContext("2d")
+  // canvas.height += 3000
   console.log(canvas.width)
   console.log("rowNum", rowNum)
 
@@ -562,7 +565,7 @@ function clearImg(id) {
       tile8[i] = null
     }
     drawTile8()
-  } else if (id === "tile20x4") {
+  } else if (id === "tile30x4") {
     for (let i = 0; i < tile3.length; i++) {
       tile3[i] = null
     }
@@ -589,7 +592,7 @@ function paletteClick(node, id, index) {
       node.setAttribute("style", "background-color:" + curSelectColor)
     }
     drawTile8()
-  } else if (id === "tile20x4") {
+  } else if (id === "tile30x4") {
     if (curSelectColor !== null) {
       palette20[index] = curSelectColor
       // background-colo:rgb(124, 124, 124);background: rgb(124, 124, 124);
